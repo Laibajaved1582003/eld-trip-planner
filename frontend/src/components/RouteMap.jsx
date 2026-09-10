@@ -2,65 +2,116 @@
 // Renders an interactive Leaflet map showing the driving route polyline and waypoint markers.
 
 import { useEffect } from 'react';
-import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Polyline,
+  Marker,
+  Popup as LeafletPopup,
+  Tooltip as LeafletTooltip,
+  useMap,
+} from 'react-leaflet';
 import { motion } from 'framer-motion';
 import L from 'leaflet';
 import { useTheme } from '../context/ThemeContext';
 import AnimatedNumber from './AnimatedNumber';
 import Tooltip from './Tooltip';
 
-// ── Fix the broken Leaflet default icon with Vite ─────────────────────────────
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
-
 // Coloured markers for current / pickup / dropoff
 const MARKER_COLORS = {
-  current: '#3b82f6',   // blue
-  pickup:  '#10b981',   // green
-  dropoff: '#ef4444',   // red
+  current: '#3b82f6',   // Blue for Current Location
+  pickup:  '#10b981',   // Green for Pickup
+  dropoff: '#ef4444',   // Red for Dropoff
 };
 
-function makeIcon(label, index = 0) {
-  const color = MARKER_COLORS[label] ?? '#6366f1';
-  const delaySec = (index * 0.18).toFixed(2);
-  const svg = `<div class="marker-bounce" style="animation-delay: ${delaySec}s;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36" style="filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));">
-      <path d="M14 0C6.268 0 0 6.268 0 14c0 9.333 14 22 14 22S28 23.333 28 14C28 6.268 21.732 0 14 0z" fill="${color}"/>
-      <circle cx="14" cy="14" r="7" fill="white" opacity="0.95"/>
-    </svg>
-  </div>`;
+const LABEL_MAP = {
+  current: 'Current Location',
+  pickup:  'Pickup',
+  dropoff: 'Dropoff',
+};
+
+function makeCircularIcon(label) {
+  const color = MARKER_COLORS[label] ?? '#3b82f6';
+  const html = `
+    <div class="custom-marker-wrapper" style="
+      width: 22px;
+      height: 22px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">
+      <div style="
+        position: absolute;
+        inset: -2px;
+        border-radius: 50%;
+        background-color: ${color};
+        opacity: 0.35;
+        filter: blur(4px);
+        pointer-events: none;
+      "></div>
+      <div class="custom-marker-dot" style="
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background-color: ${color};
+        border: 2.5px solid #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      ">
+        <div style="width: 4px; height: 4px; border-radius: 50%; background-color: #ffffff; opacity: 0.9;"></div>
+      </div>
+    </div>
+  `;
   return L.divIcon({
-    html: svg,
-    className: '',
-    iconSize: [28, 36],
-    iconAnchor: [14, 36],
-    popupAnchor: [0, -38],
+    html,
+    className: 'custom-leaflet-marker',
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+    popupAnchor: [0, -14],
+    tooltipAnchor: [0, -14],
   });
 }
 
-// Auto-fit bounds to the polyline after mount
+function formatDriveTime(hours) {
+  const h = Math.floor(hours);
+  const m = Math.round((hours - h) * 60);
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+// Auto-fit bounds to the polyline with generous padding
 function FitBounds({ positions }) {
   const map = useMap();
   useEffect(() => {
     if (positions && positions.length > 1) {
-      map.fitBounds(positions, { padding: [40, 40] });
+      map.fitBounds(positions, {
+        padding: [50, 50],
+        maxZoom: 14,
+        animate: true,
+      });
     }
   }, [map, positions]);
   return null;
 }
 
-const LABEL_MAP = { current: 'Current Location', pickup: 'Pickup', dropoff: 'Dropoff' };
-
-export default function RouteMap({ route }) {
+export default function RouteMap({ route, tripInput }) {
   const { isDark } = useTheme();
   const { geometry = [], waypoints = [], distance_miles = 0, duration_hours = 0 } = route;
 
   // Default center (US center) if no geometry
   const center = geometry.length > 0 ? geometry[Math.floor(geometry.length / 2)] : [39.5, -98.35];
+
+  const getAddress = (label) => {
+    if (tripInput) {
+      if (label === 'current') return tripInput.current_location;
+      if (label === 'pickup')  return tripInput.pickup_location;
+      if (label === 'dropoff') return tripInput.dropoff_location;
+    }
+    return null;
+  };
 
   return (
     <motion.div
@@ -93,11 +144,7 @@ export default function RouteMap({ route }) {
                 value={duration_hours}
                 duration={1.0}
                 decimals={2}
-                formatter={(val) => {
-                  const h = Math.floor(val);
-                  const m = Math.round((val - h) * 60);
-                  return h > 0 ? `${h}h ${m}m` : `${m}m`;
-                }}
+                formatter={(val) => formatDriveTime(val)}
               />
             </p>
           </div>
@@ -126,44 +173,97 @@ export default function RouteMap({ route }) {
 
         {geometry.length > 1 && (
           <>
-            {/* Glow / shadow line */}
+            {/* Soft luminous glow polyline */}
             <Polyline
               positions={geometry}
               pathOptions={{
-                color: isDark ? '#3b82f6' : '#93c5fd',
-                weight: isDark ? 7 : 8,
-                opacity: isDark ? 0.4 : 0.45,
+                color: isDark ? '#38bdf8' : '#3b82f6',
+                weight: isDark ? 11 : 12,
+                opacity: isDark ? 0.35 : 0.28,
+                lineCap: 'round',
+                lineJoin: 'round',
               }}
             />
-            {/* Main route line */}
+            {/* Crisp foreground route polyline with sticky hover tooltip */}
             <Polyline
               positions={geometry}
               pathOptions={{
                 color: isDark ? '#38bdf8' : '#2563eb',
-                weight: 4,
+                weight: 5.5,
                 opacity: 0.95,
+                lineCap: 'round',
+                lineJoin: 'round',
               }}
-            />
+            >
+              <LeafletTooltip
+                sticky
+                direction="top"
+                className="glassy-map-tooltip"
+                opacity={1}
+              >
+                <div className="flex items-center gap-1.5 font-semibold text-xs whitespace-nowrap">
+                  <span>{distance_miles.toFixed(2)} mi</span>
+                  <span className="opacity-60">·</span>
+                  <span>{formatDriveTime(duration_hours)}</span>
+                </div>
+              </LeafletTooltip>
+            </Polyline>
             <FitBounds positions={geometry} />
           </>
         )}
 
-        {waypoints.map((wp, idx) => (
-          <Marker
-            key={wp.label}
-            position={[wp.lat, wp.lng]}
-            icon={makeIcon(wp.label, idx)}
-          >
-            <Popup>
-              <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                {LABEL_MAP[wp.label] ?? wp.label}
-              </div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">
-                {wp.lat.toFixed(4)}, {wp.lng.toFixed(4)}
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {waypoints.map((wp, idx) => {
+          const role = LABEL_MAP[wp.label] ?? wp.label;
+          const address = getAddress(wp.label) || wp.address || wp.name;
+          const color = MARKER_COLORS[wp.label] ?? '#3b82f6';
+
+          return (
+            <Marker
+              key={wp.label || idx}
+              position={[wp.lat, wp.lng]}
+              icon={makeCircularIcon(wp.label)}
+            >
+              {/* Hover Tooltip */}
+              <LeafletTooltip
+                direction="top"
+                offset={[0, -14]}
+                opacity={1}
+                className="glassy-map-tooltip"
+              >
+                <div className="font-bold text-xs leading-tight flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                  {role}
+                </div>
+                {address && (
+                  <div className="text-[11px] text-slate-300 mt-0.5 font-normal truncate max-w-[200px]">
+                    {address}
+                  </div>
+                )}
+              </LeafletTooltip>
+
+              {/* Click Popup */}
+              <LeafletPopup
+                offset={[0, -10]}
+                className="glassy-map-popup"
+              >
+                <div className="p-1 min-w-[140px]">
+                  <div className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5 leading-tight">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: color }} />
+                    {role}
+                  </div>
+                  {address && (
+                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 font-medium leading-snug">
+                      {address}
+                    </p>
+                  )}
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 font-mono">
+                    {wp.lat.toFixed(4)}, {wp.lng.toFixed(4)}
+                  </p>
+                </div>
+              </LeafletPopup>
+            </Marker>
+          );
+        })}
       </MapContainer>
 
       {/* ── Legend ── */}

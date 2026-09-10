@@ -52,11 +52,13 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]         = useState(null);
   const [result, setResult]       = useState(null);
+  const [tripInput, setTripInput] = useState(null);
 
   const handleSubmit = async (formData) => {
     setIsLoading(true);
     setError(null);
     setResult(null);
+    setTripInput(formData);
 
     try {
       const data = await planTrip(formData);
@@ -182,7 +184,7 @@ export default function App() {
                     title="Route Map"
                     subtitle="Driving route with waypoints"
                   />
-                  <RouteMap route={result.route} />
+                  <RouteMap route={result.route} tripInput={tripInput} />
                 </motion.div>
               )}
             </AnimatePresence>

@@ -26,7 +26,7 @@ export default function AnimatedScene() {
   return (
     <>
       <div
-        className="fixed inset-0 w-screen h-screen pointer-events-none select-none overflow-hidden z-0 transition-colors duration-700"
+        className="fixed inset-0 w-full h-full pointer-events-none select-none overflow-hidden z-0 transition-colors duration-700"
         aria-hidden="true"
       >
       {/* ── 1. Sky Gradient Base (Full Viewport) ── */}
@@ -139,8 +139,8 @@ export default function AnimatedScene() {
         </svg>
       </div>
 
-      {/* ── 7. Highway Roadside Signs (Passing by above road at 198px) ── */}
-      <div className="absolute bottom-[198px] left-0 right-0 h-[85px] overflow-hidden pointer-events-none">
+      {/* ── 7. Highway Roadside Signs (Hidden on mobile below 640px to prevent crowding) ── */}
+      <div className="hidden sm:block absolute bottom-[198px] left-0 right-0 h-[85px] overflow-hidden pointer-events-none">
         {/* Sign 1: Interstate 80 / 90 */}
         <div className="absolute bottom-0 animate-sign-1 flex flex-col items-center">
           <div className="bg-emerald-800/90 dark:bg-emerald-900/90 border-2 border-white/90 text-white rounded-md shadow-md px-2.5 py-1 text-center backdrop-blur-sm">
@@ -166,12 +166,12 @@ export default function AnimatedScene() {
 
     {/* ── 8. Highway / Road Strip (Fixed directly above footer at bottom: 48px, Height: 150px, z-index: 20) ── */}
     <div
-      className="fixed bottom-[48px] left-0 w-screen h-[150px] z-20 pointer-events-none select-none overflow-hidden bg-gradient-to-b from-[#334155] via-[#1e293b] to-[#0f172a] dark:from-[#1e293b] dark:via-[#0f172a] dark:to-[#020617] border-t-2 border-amber-500/50 shadow-2xl"
+      className="fixed bottom-[48px] left-0 right-0 w-full h-[150px] z-20 pointer-events-none select-none overflow-hidden bg-gradient-to-b from-[#334155] via-[#1e293b] to-[#0f172a] dark:from-[#1e293b] dark:via-[#0f172a] dark:to-[#020617] border-t-2 border-amber-500/50 shadow-2xl"
       style={{
         position: 'fixed',
         bottom: '48px',
         left: 0,
-        width: '100vw',
+        right: 0,
         height: '150px',
         zIndex: 20,
       }}
@@ -184,14 +184,33 @@ export default function AnimatedScene() {
       <div className="absolute inset-x-0 top-[70px] -translate-y-1/2 h-[4px] bg-repeat-x road-dashed-line animate-road-scroll" />
 
       {/* Animated Moving Truck */}
-      <div className="absolute left-[10%] sm:left-[16%] bottom-[12px] flex items-end animate-truck-bounce">
-        {/* Exhaust puff particles scaled for larger truck */}
-        <div className="flex items-end gap-1.5 -scale-x-100 mr-1.5 mb-3">
-          <span className="w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-400/60 animate-exhaust-1" />
-          <span className="w-3.5 h-3.5 rounded-full bg-slate-400/40 dark:bg-slate-400/40 animate-exhaust-2" />
+      <div
+        className="absolute left-[8%] sm:left-[16%] bottom-[12px] flex items-end animate-truck-bounce"
+        style={{
+          background: 'none',
+          backgroundColor: 'transparent',
+          backgroundImage: 'none',
+          border: 'none',
+          boxShadow: 'none',
+        }}
+      >
+        {/* Exhaust puff particles scaled for truck */}
+        <div className="flex items-end gap-1 sm:gap-1.5 -scale-x-100 mr-1 sm:mr-1.5 mb-2 sm:mb-3" style={{ background: 'transparent' }}>
+          <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-400/60 animate-exhaust-1" />
+          <span className="w-2.5 sm:w-3.5 h-2.5 sm:h-3.5 rounded-full bg-slate-400/40 dark:bg-slate-400/40 animate-exhaust-2" />
         </div>
-        {/* Truck Emoji (scaled up ~2.3x for clear focal prominence) */}
-        <span className="text-[72px] sm:text-[84px] leading-none filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.85)] select-none inline-block">
+        {/* Truck Emoji with soft grounding and glowing drop-shadows, zero background box */}
+        <span
+          className="text-5xl sm:text-[72px] md:text-[84px] leading-none select-none inline-block"
+          style={{
+            filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.5)) drop-shadow(0 0 14px rgba(59,130,246,0.3))',
+            background: 'none',
+            backgroundColor: 'transparent',
+            backgroundImage: 'none',
+            border: 'none',
+            boxShadow: 'none',
+          }}
+        >
           🚛
         </span>
       </div>

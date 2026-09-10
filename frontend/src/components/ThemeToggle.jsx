@@ -13,7 +13,7 @@ export default function ThemeToggle() {
       whileHover={{ scale: 1.06 }}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      className="relative flex items-center justify-center w-9 h-9 rounded-xl border border-slate-700/60 bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white shadow-sm transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className="relative flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-slate-700/60 bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white shadow-sm transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       <AnimatePresence mode="wait" initial={false}>
         {isDark ? (

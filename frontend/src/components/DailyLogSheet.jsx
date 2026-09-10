@@ -5,6 +5,7 @@ import { format, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import AnimatedNumber from './AnimatedNumber';
+import Tooltip from './Tooltip';
 
 // ── Grid constants ──────────────────────────────────────────────────────────
 const GRID_LEFT   = 120;  // px — room for row labels
@@ -19,6 +20,13 @@ const ROWS = [
 ];
 const NUM_ROWS = ROWS.length;
 const HOURS = Array.from({ length: 25 }, (_, i) => i); // 0..24
+
+const ROW_TOOLTIPS = {
+  off_duty: 'Hours off duty, not working',
+  sleeper_berth: 'Hours resting in the sleeper berth',
+  driving: 'Hours spent actively driving',
+  on_duty_not_driving: 'Hours on duty but not driving (loading, fueling, paperwork)',
+};
 
 const STATUS_COLORS = {
   off_duty:            '#3b82f6', // blue-500
@@ -95,14 +103,14 @@ export default function DailyLogSheet({ log }) {
   return (
     <div className="glass-card rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
       {/* Header Banner */}
-      <div className="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 text-white border-b border-white/10">
+      <div className="flex items-center justify-between px-3.5 sm:px-5 py-2.5 sm:py-3.5 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 text-white border-b border-white/10">
         <div>
-          <p className="text-xs text-blue-300 dark:text-blue-400 uppercase tracking-widest font-bold">Driver's Daily Log</p>
-          <p className="font-bold text-base text-slate-100">{dateLabel}</p>
+          <p className="text-[10px] sm:text-xs text-blue-300 dark:text-blue-400 uppercase tracking-widest font-bold">Driver's Daily Log</p>
+          <p className="font-bold text-sm sm:text-base text-slate-100">{dateLabel}</p>
         </div>
-        <div className="text-right">
-          <p className="text-xs text-slate-400 font-medium">Total on-duty</p>
-          <p className="font-bold text-lg text-amber-400 dark:text-amber-300">
+        <div className="text-right shrink-0">
+          <p className="text-[10px] sm:text-xs text-slate-400 font-medium">Total on-duty</p>
+          <p className="font-bold text-base sm:text-lg text-amber-400 dark:text-amber-300">
             <AnimatedNumber
               value={(totals.driving ?? 0) + (totals.on_duty_not_driving ?? 0)}
               decimals={2}
@@ -113,14 +121,20 @@ export default function DailyLogSheet({ log }) {
         </div>
       </div>
 
+      {/* Mobile scroll hint */}
+      <div className="sm:hidden px-3 pt-2 pb-0.5 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between font-medium">
+        <span>↔ Scroll horizontally for full 24-hr timeline</span>
+        <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold">24h Grid</span>
+      </div>
+
       {/* SVG Grid */}
-      <div className="overflow-x-auto px-4 pt-4 pb-2">
+      <div className="overflow-x-auto px-2 sm:px-4 pt-2 sm:pt-4 pb-2 touch-pan-x" style={{ WebkitOverflowScrolling: 'touch' }}>
         <svg
           width={SVG_WIDTH}
           height={SVG_HEIGHT}
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           className="w-full"
-          style={{ minWidth: '600px' }}
+          style={{ minWidth: '700px' }}
           aria-label={`HOS log grid for ${date}`}
         >
           {/* ── Hour grid lines (vertical) ── */}
@@ -273,46 +287,58 @@ export default function DailyLogSheet({ log }) {
       </div>
 
       {/* ── Totals table / Summary Chips ── */}
-      <div className="px-5 pb-5 pt-2">
-        <div className="grid grid-cols-5 gap-2 text-center">
+      <div className="px-3 sm:px-5 pb-4 sm:pb-5 pt-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-center">
           {ROWS.map((row) => (
-            <motion.div
+            <Tooltip
               key={row.key}
+              text={ROW_TOOLTIPS[row.key]}
+              position="top"
+              className="w-full cursor-help justify-center"
+            >
+              <motion.div
+                whileHover={{ y: -2 }}
+                transition={{ duration: 0.15 }}
+                className="w-full rounded-xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-md border border-slate-200/80 dark:border-white/10 px-2 py-2 sm:py-2.5 shadow-sm transition-colors duration-200"
+              >
+                <div
+                  className="text-xs font-bold mb-0.5 sm:mb-1 truncate"
+                  style={{ color: STATUS_COLORS[row.key] }}
+                >
+                  {row.short}
+                </div>
+                <div className="text-slate-800 dark:text-slate-100 font-bold text-sm tracking-tight">
+                  <AnimatedNumber
+                    value={totals[row.key] ?? 0}
+                    decimals={2}
+                    duration={0.8}
+                    suffix="h"
+                  />
+                </div>
+              </motion.div>
+            </Tooltip>
+          ))}
+          <Tooltip
+            text="Total hours across all duty statuses for this day (should equal 24.00h)"
+            position="top"
+            className="w-full cursor-help justify-center col-span-2 sm:col-span-1 md:col-span-1"
+          >
+            <motion.div
               whileHover={{ y: -2 }}
               transition={{ duration: 0.15 }}
-              className="rounded-xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-md border border-slate-200/80 dark:border-white/10 px-2 py-2.5 shadow-sm transition-colors duration-200"
+              className="w-full rounded-xl bg-blue-50/80 dark:bg-indigo-950/50 backdrop-blur-md border border-blue-200/90 dark:border-indigo-800/50 px-2 py-2 sm:py-2.5 shadow-sm transition-colors duration-200"
             >
-              <div
-                className="text-xs font-bold mb-1 truncate"
-                style={{ color: STATUS_COLORS[row.key] }}
-              >
-                {row.short}
-              </div>
-              <div className="text-slate-800 dark:text-slate-100 font-bold text-sm tracking-tight">
+              <div className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-0.5 sm:mb-1">TOTAL</div>
+              <div className={`font-bold text-sm tracking-tight ${Math.abs(totalSum - 24) < 0.01 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
                 <AnimatedNumber
-                  value={totals[row.key] ?? 0}
+                  value={totalSum}
                   decimals={2}
                   duration={0.8}
                   suffix="h"
                 />
               </div>
             </motion.div>
-          ))}
-          <motion.div
-            whileHover={{ y: -2 }}
-            transition={{ duration: 0.15 }}
-            className="rounded-xl bg-blue-50/80 dark:bg-indigo-950/50 backdrop-blur-md border border-blue-200/90 dark:border-indigo-800/50 px-2 py-2.5 shadow-sm transition-colors duration-200"
-          >
-            <div className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">TOTAL</div>
-            <div className={`font-bold text-sm tracking-tight ${Math.abs(totalSum - 24) < 0.01 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
-              <AnimatedNumber
-                value={totalSum}
-                decimals={2}
-                duration={0.8}
-                suffix="h"
-              />
-            </div>
-          </motion.div>
+          </Tooltip>
         </div>
       </div>
     </div>

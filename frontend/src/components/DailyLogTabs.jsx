@@ -21,7 +21,7 @@ export default function DailyLogTabs({ dailyLogs }) {
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-1.5 pt-0.5">
+      <div className="flex gap-1.5 sm:gap-2 mb-3.5 sm:mb-4 overflow-x-auto pb-2 pt-0.5 touch-pan-x">
         {dailyLogs.map((log, idx) => {
           const dayLabel = format(parseISO(log.date), 'MMM d');
           const isActive = idx === activeIdx;
@@ -31,7 +31,7 @@ export default function DailyLogTabs({ dailyLogs }) {
               id={`log-tab-${idx}`}
               onClick={() => setActiveIdx(idx)}
               className={
-                'relative flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 focus:outline-none ' +
+                'relative flex-shrink-0 min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 focus:outline-none ' +
                 (isActive
                   ? 'text-white'
                   : 'bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 hover:bg-white dark:hover:bg-slate-750 hover:border-slate-300 dark:hover:border-white/20 shadow-sm')

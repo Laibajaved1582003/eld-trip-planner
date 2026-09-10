@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import L from 'leaflet';
 import { useTheme } from '../context/ThemeContext';
 import AnimatedNumber from './AnimatedNumber';
+import Tooltip from './Tooltip';
 
 // ── Fix the broken Leaflet default icon with Vite ─────────────────────────────
 delete L.Icon.Default.prototype._getIconUrl;
@@ -69,28 +70,25 @@ export default function RouteMap({ route }) {
       className="glass-card rounded-2xl overflow-hidden shadow-xl transition-all duration-300"
     >
       {/* ── Stat bar (Gradient Pill Style) ── */}
-      <div className="flex items-center gap-6 px-5 py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-slate-950/95 dark:via-indigo-950/90 dark:to-purple-950/90 text-white border-b border-white/15 shadow-md">
-        <div className="flex items-center gap-2">
-          <span className="text-blue-200 dark:text-blue-300 text-sm filter drop-shadow-sm select-none">📏</span>
-          <div>
-            <p className="text-xs text-blue-100 dark:text-slate-400 font-medium leading-none">Distance</p>
-            <p className="font-bold text-lg leading-tight tracking-tight">
+      <div className="relative z-20 grid grid-cols-3 divide-x divide-white/20 dark:divide-slate-700 px-2 sm:px-5 py-2.5 sm:py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-slate-950/95 dark:via-indigo-950/90 dark:to-purple-950/90 text-white border-b border-white/15 shadow-md">
+        <Tooltip text="Total driving distance for this route" position="bottom" className="w-full justify-center">
+          <div className="cursor-help px-1 sm:px-2 text-center sm:text-left w-full">
+            <p className="text-[10px] sm:text-xs text-blue-100 dark:text-slate-400 font-medium leading-none truncate">Distance</p>
+            <p className="font-bold text-sm sm:text-lg leading-tight tracking-tight mt-0.5 sm:mt-1 truncate">
               <AnimatedNumber
                 value={distance_miles}
                 duration={1.0}
                 decimals={0}
                 formatter={(val) => val.toLocaleString()}
               />{' '}
-              <span className="text-xs font-normal text-blue-200 dark:text-slate-400">mi</span>
+              <span className="text-[10px] sm:text-xs font-normal text-blue-200 dark:text-slate-400">mi</span>
             </p>
           </div>
-        </div>
-        <div className="w-px h-8 bg-white/20 dark:bg-slate-700" />
-        <div className="flex items-center gap-2">
-          <span className="text-blue-200 dark:text-blue-300 text-sm filter drop-shadow-sm select-none">⏱</span>
-          <div>
-            <p className="text-xs text-blue-100 dark:text-slate-400 font-medium leading-none">Drive Time</p>
-            <p className="font-bold text-lg leading-tight tracking-tight">
+        </Tooltip>
+        <Tooltip text="Estimated total driving time, excluding rest stops" position="bottom" className="w-full justify-center">
+          <div className="cursor-help px-1 sm:px-2 text-center sm:text-left w-full">
+            <p className="text-[10px] sm:text-xs text-blue-100 dark:text-slate-400 font-medium leading-none truncate">Drive Time</p>
+            <p className="font-bold text-sm sm:text-lg leading-tight tracking-tight mt-0.5 sm:mt-1 truncate">
               <AnimatedNumber
                 value={duration_hours}
                 duration={1.0}
@@ -103,25 +101,22 @@ export default function RouteMap({ route }) {
               />
             </p>
           </div>
-        </div>
-        <div className="w-px h-8 bg-white/20 dark:bg-slate-700" />
-        <div className="flex items-center gap-2">
-          <span className="text-blue-200 dark:text-blue-300 text-sm filter drop-shadow-sm select-none">📍</span>
-          <div>
-            <p className="text-xs text-blue-100 dark:text-slate-400 font-medium leading-none">Waypoints</p>
-            <p className="font-bold text-lg leading-tight tracking-tight">
+        </Tooltip>
+        <Tooltip text="Number of stops: current location, pickup, and dropoff" position="bottom" className="w-full justify-center">
+          <div className="cursor-help px-1 sm:px-2 text-center sm:text-left w-full">
+            <p className="text-[10px] sm:text-xs text-blue-100 dark:text-slate-400 font-medium leading-none truncate">Waypoints</p>
+            <p className="font-bold text-sm sm:text-lg leading-tight tracking-tight mt-0.5 sm:mt-1 truncate">
               <AnimatedNumber value={waypoints.length} duration={0.8} />
             </p>
           </div>
-        </div>
+        </Tooltip>
       </div>
 
       {/* ── Map ── */}
       <MapContainer
         center={center}
         zoom={6}
-        className={isDark ? 'dark-theme-map' : ''}
-        style={{ height: '420px', width: '100%' }}
+        className={`route-map-container ${isDark ? 'dark-theme-map' : ''}`}
         scrollWheelZoom={true}
       >
         <TileLayer
@@ -172,7 +167,7 @@ export default function RouteMap({ route }) {
       </MapContainer>
 
       {/* ── Legend ── */}
-      <div className="flex items-center gap-4 px-5 py-3 bg-white/75 dark:bg-slate-900/75 backdrop-blur-md border-t border-slate-200/60 dark:border-white/10 text-xs text-slate-700 dark:text-slate-300 transition-colors duration-200">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-3.5 sm:px-5 py-2.5 sm:py-3 bg-white/75 dark:bg-slate-900/75 backdrop-blur-md border-t border-slate-200/60 dark:border-white/10 text-xs text-slate-700 dark:text-slate-300 transition-colors duration-200">
         {waypoints.map((wp, idx) => (
           <motion.div
             key={wp.label}

@@ -3,10 +3,10 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext({
-  theme: 'light',
+  theme: 'dark',
   toggleTheme: () => {},
   setTheme: () => {},
-  isDark: false,
+  isDark: true,
 });
 
 const STORAGE_KEY = 'eld_theme';
@@ -21,7 +21,7 @@ export function ThemeProvider({ children }) {
     } catch {
       // localStorage may be unavailable or disabled
     }
-    return 'light';
+    return 'dark';
   });
 
   useEffect(() => {

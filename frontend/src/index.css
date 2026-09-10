@@ -31,8 +31,16 @@
   --accent-purple: #a855f7;
 }
 
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 body {
   margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
   background-color: transparent;
   color: #1e293b;
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -50,6 +58,25 @@ html.dark body {
   max-width: none;
   border: none;
   text-align: left;
+  overflow-x: hidden;
+}
+
+/* ── Responsive Map Container ─────────────────────────────────────── */
+.route-map-container {
+  height: 280px !important;
+  width: 100% !important;
+}
+
+@media (min-width: 640px) {
+  .route-map-container {
+    height: 350px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .route-map-container {
+    height: 420px !important;
+  }
 }
 
 /* ── Glassy Card Styling with solid backdrop blur ─────────────────── */

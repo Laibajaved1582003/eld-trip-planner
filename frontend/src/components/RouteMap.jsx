@@ -120,23 +120,14 @@ export default function RouteMap({ route }) {
       <MapContainer
         center={center}
         zoom={6}
+        className={isDark ? 'dark-theme-map' : ''}
         style={{ height: '420px', width: '100%' }}
         scrollWheelZoom={true}
       >
-        {isDark ? (
-          <TileLayer
-            key="carto-dark-tiles"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            subdomains="abcd"
-          />
-        ) : (
-          <TileLayer
-            key="osm-light-tiles"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-        )}
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
         {geometry.length > 1 && (
           <>

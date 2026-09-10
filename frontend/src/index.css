@@ -1,0 +1,356 @@
+/* Tailwind v4 entry point — imports the full framework */
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Leaflet CSS */
+@import "leaflet/dist/leaflet.css";
+
+/* ── Custom base overrides ────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-sky-top: #38bdf8;
+  --bg-sky-mid: #bae6fd;
+  --bg-sky-low: #fed7aa;
+  --text-main: #111827;
+  --text-muted: #4b5563;
+  --accent-blue: #2563eb;
+  --accent-purple: #8b5cf6;
+}
+
+.dark {
+  --bg-sky-top: #030712;
+  --bg-sky-mid: #0a1128;
+  --bg-sky-low: #1e1b4b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent-blue: #38bdf8;
+  --accent-purple: #a855f7;
+}
+
+body {
+  margin: 0;
+  background-color: transparent;
+  color: #1e293b;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+html.dark body {
+  color: #f8fafc;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  max-width: none;
+  border: none;
+  text-align: left;
+}
+
+/* ── Glassy Card Styling with solid backdrop blur ─────────────────── */
+.glass-card {
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 16px 40px -8px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+}
+
+.dark .glass-card {
+  background-color: rgba(11, 19, 43, 0.90);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.65), 0 0 25px 2px rgba(59, 130, 246, 0.08);
+}
+
+/* ── Leaflet z-index fix & dark mode styling ─────────────────────── */
+.leaflet-container {
+  z-index: 0;
+}
+
+.dark .leaflet-container {
+  background-color: #0b132b !important;
+}
+
+.dark .leaflet-control-zoom a {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+  border-color: #334155 !important;
+}
+
+.dark .leaflet-control-zoom a:hover {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.dark .leaflet-control-attribution {
+  background-color: rgba(11, 19, 43, 0.85) !important;
+  color: #94a3b8 !important;
+  backdrop-filter: blur(8px);
+}
+
+.dark .leaflet-control-attribution a {
+  color: #38bdf8 !important;
+}
+
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ── Log sheet SVG line styling ──────────────────────────────────── */
+.hos-line {
+  stroke: #2563eb;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.dark .hos-line {
+  stroke: #38bdf8;
+}
+
+.hos-grid-line {
+  stroke: #e2e8f0;
+  stroke-width: 1;
+}
+
+.dark .hos-grid-line {
+  stroke: #1e293b;
+}
+
+.hos-major-grid {
+  stroke: #cbd5e1;
+  stroke-width: 1;
+}
+
+.dark .hos-major-grid {
+  stroke: #334155;
+}
+
+/* ── Marker drop bounce animation ─────────────────────────────────── */
+@keyframes markerDropBounce {
+  0% {
+    opacity: 0;
+    transform: translateY(-36px) scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(3px) scale(1.06);
+  }
+  80% {
+    transform: translateY(-2px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.marker-bounce {
+  animation: markerDropBounce 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Background Scene Keyframe Animations ─────────────────────────── */
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes floatOrb {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(2deg);
+  }
+}
+
+.animate-float-orb {
+  animation: floatOrb 6s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+@keyframes roadScroll {
+  0% {
+    background-position-x: 0px;
+  }
+  100% {
+    background-position-x: -48px;
+  }
+}
+
+.road-dashed-line {
+  background-image: repeating-linear-gradient(
+    90deg,
+    #fbbf24 0px,
+    #fbbf24 24px,
+    transparent 24px,
+    transparent 48px
+  );
+  background-size: 48px 4px;
+}
+
+.animate-road-scroll {
+  animation: roadScroll 0.9s linear infinite;
+}
+
+@keyframes truckBounce {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-truck-bounce {
+  animation: truckBounce 0.6s ease-in-out infinite;
+}
+
+@keyframes exhaustPuff {
+  0% {
+    opacity: 0.8;
+    transform: translate(0, 0) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-14px, -8px) scale(1.5);
+  }
+}
+
+.animate-exhaust-1 {
+  animation: exhaustPuff 0.8s ease-out infinite;
+}
+
+.animate-exhaust-2 {
+  animation: exhaustPuff 0.8s ease-out 0.4s infinite;
+}
+
+@keyframes driftMountainsFar {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-drift-mountains-far {
+  animation: driftMountainsFar 60s linear infinite;
+}
+
+.animate-drift-mountains-near {
+  animation: driftMountainsFar 35s linear infinite;
+}
+
+/* ── Road Sign Drift Animations ── */
+@keyframes driftSign1 {
+  0% {
+    transform: translateX(100vw);
+  }
+  100% {
+    transform: translateX(-350px);
+  }
+}
+
+@keyframes driftSign2 {
+  0% {
+    transform: translateX(100vw);
+  }
+  100% {
+    transform: translateX(-350px);
+  }
+}
+
+.animate-sign-1 {
+  animation: driftSign1 26s linear infinite;
+}
+
+.animate-sign-2 {
+  animation: driftSign2 26s linear infinite -13s;
+}
+
+/* ── Cloud Drift Animations ── */
+@keyframes driftCloud1 {
+  0% {
+    transform: translateX(-280px);
+  }
+  100% {
+    transform: translateX(calc(100vw + 280px));
+  }
+}
+
+@keyframes driftCloud2 {
+  0% {
+    transform: translateX(-320px);
+  }
+  100% {
+    transform: translateX(calc(100vw + 320px));
+  }
+}
+
+@keyframes driftCloud3 {
+  0% {
+    transform: translateX(-240px);
+  }
+  100% {
+    transform: translateX(calc(100vw + 240px));
+  }
+}
+
+.animate-drift-cloud-1 {
+  animation: driftCloud1 45s linear infinite;
+}
+
+.animate-drift-cloud-2 {
+  animation: driftCloud2 70s linear infinite -20s;
+}
+
+.animate-drift-cloud-3 {
+  animation: driftCloud3 58s linear infinite -38s;
+}
+
+.blueprint-grid-overlay {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0) 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 35%, rgba(0,0,0,0) 80%);
+}

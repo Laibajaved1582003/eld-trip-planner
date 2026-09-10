@@ -24,10 +24,11 @@ export default function AnimatedScene() {
   }, []);
 
   return (
-    <div
-      className="fixed inset-0 w-screen h-screen pointer-events-none select-none overflow-hidden z-0 transition-colors duration-700"
-      aria-hidden="true"
-    >
+    <>
+      <div
+        className="fixed inset-0 w-screen h-screen pointer-events-none select-none overflow-hidden z-0 transition-colors duration-700"
+        aria-hidden="true"
+      >
       {/* ── 1. Sky Gradient Base (Full Viewport) ── */}
       <div
         className={`absolute inset-0 transition-opacity duration-1000 ${
@@ -112,8 +113,8 @@ export default function AnimatedScene() {
         </div>
       </div>
 
-      {/* ── 5. Parallax Mountains: Far Layer (Sitting on top of 150px Road) ── */}
-      <div className="absolute bottom-[150px] left-0 right-0 h-44 sm:h-56 overflow-hidden pointer-events-none">
+      {/* ── 5. Parallax Mountains: Far Layer (Sitting on top of road at 198px) ── */}
+      <div className="absolute bottom-[198px] left-0 right-0 h-44 sm:h-56 overflow-hidden pointer-events-none">
         <svg
           className={`w-[200%] h-full animate-drift-mountains-far ${
             isDark ? 'fill-[#0d1738] opacity-60' : 'fill-[#93c5fd] opacity-45'
@@ -125,8 +126,8 @@ export default function AnimatedScene() {
         </svg>
       </div>
 
-      {/* ── 6. Parallax Mountains: Near Layer (Sitting on top of 150px Road) ── */}
-      <div className="absolute bottom-[150px] left-0 right-0 h-32 sm:h-44 overflow-hidden pointer-events-none">
+      {/* ── 6. Parallax Mountains: Near Layer (Sitting on top of road at 198px) ── */}
+      <div className="absolute bottom-[198px] left-0 right-0 h-32 sm:h-44 overflow-hidden pointer-events-none">
         <svg
           className={`w-[200%] h-full animate-drift-mountains-near ${
             isDark ? 'fill-[#070e24] opacity-85' : 'fill-[#60a5fa] opacity-55'
@@ -138,8 +139,8 @@ export default function AnimatedScene() {
         </svg>
       </div>
 
-      {/* ── 7. Highway Roadside Signs (Passing by above road at bottom: 150px) ── */}
-      <div className="absolute bottom-[150px] left-0 right-0 h-[85px] overflow-hidden pointer-events-none">
+      {/* ── 7. Highway Roadside Signs (Passing by above road at 198px) ── */}
+      <div className="absolute bottom-[198px] left-0 right-0 h-[85px] overflow-hidden pointer-events-none">
         {/* Sign 1: Interstate 80 / 90 */}
         <div className="absolute bottom-0 animate-sign-1 flex flex-col items-center">
           <div className="bg-emerald-800/90 dark:bg-emerald-900/90 border-2 border-white/90 text-white rounded-md shadow-md px-2.5 py-1 text-center backdrop-blur-sm">
@@ -159,30 +160,42 @@ export default function AnimatedScene() {
         </div>
       </div>
 
-      {/* ── 8. Highway / Road Strip (Fixed at True Bottom, Height: 150px) ── */}
-      <div className="absolute bottom-0 left-0 right-0 h-[150px] bg-gradient-to-b from-[#334155] via-[#1e293b] to-[#0f172a] dark:from-[#1e293b] dark:via-[#0f172a] dark:to-[#020617] border-t-2 border-amber-500/50 shadow-2xl overflow-hidden">
-        {/* Road Shoulder / Guardrail Glow */}
-        <div className="absolute inset-x-0 top-0 h-[3px] bg-white/40 dark:bg-slate-500/40" />
-
-        {/* Animated Dashed Center Lane Divider */}
-        <div className="absolute inset-x-0 top-[70px] -translate-y-1/2 h-[4px] bg-repeat-x road-dashed-line animate-road-scroll" />
-
-        {/* Animated Moving Truck */}
-        <div className="absolute left-[12%] sm:left-[18%] bottom-[42px] flex items-center gap-1.5 animate-truck-bounce">
-          {/* Exhaust puff particles */}
-          <div className="flex gap-1 -scale-x-100 mr-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-400/60 dark:bg-slate-500/60 animate-exhaust-1" />
-            <span className="w-2 h-2 rounded-full bg-slate-400/40 dark:bg-slate-500/40 animate-exhaust-2" />
-          </div>
-          {/* Truck Emoji */}
-          <span className="text-3xl sm:text-4xl filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.7)] select-none">
-            🚛
-          </span>
-        </div>
-      </div>
-
       {/* ── 9. Blueprint Grid Overlay (Masked with radial fade) ── */}
       <div className="absolute inset-0 blueprint-grid-overlay opacity-25 dark:opacity-15 pointer-events-none" />
     </div>
+
+    {/* ── 8. Highway / Road Strip (Fixed directly above footer at bottom: 48px, Height: 150px, z-index: 20) ── */}
+    <div
+      className="fixed bottom-[48px] left-0 w-screen h-[150px] z-20 pointer-events-none select-none overflow-hidden bg-gradient-to-b from-[#334155] via-[#1e293b] to-[#0f172a] dark:from-[#1e293b] dark:via-[#0f172a] dark:to-[#020617] border-t-2 border-amber-500/50 shadow-2xl"
+      style={{
+        position: 'fixed',
+        bottom: '48px',
+        left: 0,
+        width: '100vw',
+        height: '150px',
+        zIndex: 20,
+      }}
+      aria-hidden="true"
+    >
+      {/* Road Shoulder / Guardrail Glow */}
+      <div className="absolute inset-x-0 top-0 h-[3px] bg-white/40 dark:bg-slate-500/40" />
+
+      {/* Animated Dashed Center Lane Divider */}
+      <div className="absolute inset-x-0 top-[70px] -translate-y-1/2 h-[4px] bg-repeat-x road-dashed-line animate-road-scroll" />
+
+      {/* Animated Moving Truck */}
+      <div className="absolute left-[10%] sm:left-[16%] bottom-[12px] flex items-end animate-truck-bounce">
+        {/* Exhaust puff particles scaled for larger truck */}
+        <div className="flex items-end gap-1.5 -scale-x-100 mr-1.5 mb-3">
+          <span className="w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-400/60 animate-exhaust-1" />
+          <span className="w-3.5 h-3.5 rounded-full bg-slate-400/40 dark:bg-slate-400/40 animate-exhaust-2" />
+        </div>
+        {/* Truck Emoji (scaled up ~2.3x for clear focal prominence) */}
+        <span className="text-[72px] sm:text-[84px] leading-none filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.85)] select-none inline-block">
+          🚛
+        </span>
+      </div>
+    </div>
+  </>
   );
 }

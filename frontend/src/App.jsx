@@ -76,33 +76,47 @@ export default function App() {
       {/* ── Fixed Animated Dusk/Dawn Background Scene ── */}
       <AnimatedScene />
 
-      {/* ── Main Foreground UI ── */}
-      <div className="relative z-10 flex flex-col min-h-screen">
+      {/* ── Fixed Footer Text Bar (ABSOLUTE BOTTOM-MOST strip, touching bottom of viewport: bottom: 0, z-index: 30) ── */}
+      <footer
+        className="fixed bottom-0 left-0 w-screen h-12 z-30 flex items-center justify-center border-t border-white/15 dark:border-white/10 bg-slate-900/95 dark:bg-slate-950/98 backdrop-blur-md shadow-2xl px-4 text-center transition-colors duration-300"
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '100vw',
+          height: '48px',
+          zIndex: 30,
+        }}
+      >
+        <div className="max-w-7xl mx-auto text-xs text-slate-300 dark:text-slate-400">
+          ELD Trip Planner — FMCSA Hours of Service simulation. Not a substitute for certified ELD hardware.
+        </div>
+      </footer>
+
+      {/* ── Main Foreground UI (Header, Cards, Empty-State/Results: z-35 & z-50) ── */}
+      {/* pb-[218px] reserves clearance equal to footer (48px) + road (150px) = 198px + 20px visual buffer */}
+      <div className="relative z-30 flex flex-col min-h-screen pb-[218px]">
         {/* ── Header ── */}
-        <header className="bg-slate-900/80 dark:bg-slate-950/85 backdrop-blur-md border-b border-white/10 shadow-lg sticky top-0 z-20 transition-colors duration-300">
+        <header className="bg-transparent backdrop-blur-[2px] border-b border-white/20 dark:border-white/10 sticky top-0 z-50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center gap-4">
             {/* Brand icon */}
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 shadow-md shadow-blue-500/25 text-white">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 shadow-md shadow-blue-500/25 text-white filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)] dark:drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]">
               <span className="text-xl select-none">🚛</span>
             </div>
             {/* Brand Title */}
             <div>
-              <h1 className="text-xl font-bold text-white leading-none tracking-tight">ELD Trip Planner</h1>
-              <p className="text-xs text-slate-400 mt-0.5">FMCSA Hours-of-Service Scheduler</p>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-none tracking-tight header-title-text">ELD Trip Planner</h1>
+              <p className="text-xs font-semibold sm:font-medium text-slate-800/90 dark:text-slate-300 mt-1 header-subtitle-text">FMCSA Hours-of-Service Scheduler</p>
             </div>
-            {/* Status pill & Theme toggle */}
-            <div className="ml-auto flex items-center gap-3.5">
-              <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-3 py-1 rounded-full backdrop-blur-sm">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                API connected
-              </div>
+            {/* Theme toggle */}
+            <div className="ml-auto flex items-center">
               <ThemeToggle />
             </div>
           </div>
         </header>
 
-        {/* ── Main content ── */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full pb-44">
+        {/* ── Main content (all content stops cleanly above the 210px bottom reserved space) ── */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
 
           {/* ── Top section: form + (map when result exists) ── */}
           <div className={`gap-8 ${result ? 'lg:grid lg:grid-cols-5' : ''}`}>
@@ -197,29 +211,11 @@ export default function App() {
 
           {/* ── Empty state (before first search) ── */}
           {!result && !isLoading && !error && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="glass-card max-w-xl mx-auto rounded-2xl p-8 mt-12 text-center text-slate-600 dark:text-slate-400 shadow-xl"
-            >
-              <div className="text-5xl sm:text-6xl mb-4 select-none filter drop-shadow-md">🛣️</div>
-              <p className="text-lg font-bold text-slate-800 dark:text-slate-100">
-                Enter trip details above to generate your ELD log
-              </p>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1.5 max-w-md mx-auto">
-                The planner calculates driving time, required 30-min breaks, 10-hour rest resets, and standard FMCSA daily log sheets.
-              </p>
-            </motion.div>
+            <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+              Enter trip details to generate your route and FMCSA daily logs
+            </p>
           )}
         </main>
-
-        {/* ── Footer ── */}
-        <footer className="mt-auto border-t border-white/10 dark:border-white/10 bg-slate-900/80 dark:bg-slate-950/90 backdrop-blur-md mb-[150px]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-xs text-slate-400 dark:text-slate-400">
-            ELD Trip Planner — FMCSA Hours of Service simulation. Not a substitute for certified ELD hardware.
-          </div>
-        </footer>
       </div>
     </div>
   );
